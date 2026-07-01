@@ -1,3 +1,4 @@
+
 constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
 
@@ -129,14 +130,14 @@ int edge(Vec3 P, Vec3 v0, Vec3 v1)
 
 int main(int argc, char* argv[]) // program entry point.
 {
-    
+
     // 800 * 600 framebuffer. 
     // Same size as the window SDL3 created. 
     std::vector<Entry>  framebuffer(WIDTH * HEIGHT);
     std::vector<Z>      ZBuffer(WIDTH * HEIGHT);
     /*for (int y = 0; y < HEIGHT; y++)
     {
-        for (int x = 0; x < WIDTH; x++) 
+        for (int x = 0; x < WIDTH; x++)
             framebuffer[y * WIDTH + x] = { 255, 255, 255, 255 };
     }*/
     Vec3        v0, v1, v2;
@@ -163,21 +164,21 @@ int main(int argc, char* argv[]) // program entry point.
     Bresenhem(v1.x, v1.y, v2.x, v2.y, framebuffer);
     Bresenhem(v2.x, v2.y, v0.x, v0.y, framebuffer);
 
-    Bresenhem(v3.x, v3.y, v4.x, v4.y, framebuffer); 
+    Bresenhem(v3.x, v3.y, v4.x, v4.y, framebuffer);
     Bresenhem(v4.x, v4.y, v5.x, v5.y, framebuffer);
     Bresenhem(v5.x, v5.y, v3.x, v3.y, framebuffer);
     // every pixel has 1.0 as a z value.
     // we need to update the value as we update to fragment.
     // Z value test should be done in the 
     /*
-        Now, we have to implement barycentric coordinate system. 
+        Now, we have to implement barycentric coordinate system.
         What does barycentric coordinate system does?
-            
-        We need a sample point. 
+
+        We need a sample point.
         Sample point P = ( 411, 275 ) { inside the triangle }
-        
-        what we need is v0, v1, v2. in this caes, 
-        
+
+        what we need is v0, v1, v2. in this caes,
+
         v0 = (100, 100)
         v1 = (700, 200)
         v2 = (400, 500)
@@ -185,28 +186,28 @@ int main(int argc, char* argv[]) // program entry point.
         E(P, v0, v1) = (P.x-v0.x)(v1.y-v0.y) - (P.y-v0.y)(v1.x-v0.x); -> cross product of vector P-v0 (A), v1-v0 (B)
         in other words, A cross B.
 
-        we need to do this for 3 times. 
+        we need to do this for 3 times.
         1- E(P, v0, v1)  ==  a
         2- E(P, v1, v2)  ==  b
         3- E(P, v2, v0)  ==  c
-        
+
             Area T0, T1, T2
 
             T0 = 0.5 * b (since edge function returns the area of parellogram
-            T1 = 0.5 * c 
+            T1 = 0.5 * c
             T2 = 0.5 * a
 
-        if those function all returns the negative value, then it's within the edge. 
+        if those function all returns the negative value, then it's within the edge.
         continue to set the weighted mean
 
             weighted mean
 
-            E(v2, v0, v1) == W  ---> 
+            E(v2, v0, v1) == W  --->
             l0, l1, l2
             l0 + l1 + l2 = 1
 
             l0 should be float (8 Byte)
-            l0 = b / W 
+            l0 = b / W
             l1 = c / W
             l2 = a / W
 
@@ -224,7 +225,7 @@ int main(int argc, char* argv[]) // program entry point.
     //
     //P1      =       { 393, 274 };
     //P2      =       { 678, 405 };
-    
+
 
     //a = edge(P1, v0, v1);
     //b = edge(P1, v1, v2);
@@ -232,7 +233,7 @@ int main(int argc, char* argv[]) // program entry point.
     //
     //W = edge(v2, v0, v1);
     //invW = 1.0f / W;
-    
+
     /*if (!W)
     {
         SDL_Log("W is 0");
@@ -240,11 +241,11 @@ int main(int argc, char* argv[]) // program entry point.
     }*/
 
     // we need bounding box: the smallest square that includes the pixel
-    
+
     int         W1, W2;
     float       invW1, invW2;
 
-  
+
     W1 = edge(v2, v0, v1);
     invW1 = 1.0f / W1;
 
@@ -277,7 +278,7 @@ int main(int argc, char* argv[]) // program entry point.
     ymin1 = std::min({ v0.y, v1.y, v2.y }); ymax1 = std::max({ v0.y, v1.y, v2.y });
     ymin2 = std::min({ v3.y, v4.y, v5.y }); ymax2 = std::max({ v3.y, v4.y, v5.y });
 
-    
+
     float l0 = 0.0f, l1 = 0.0f, l2 = 0.0f;
     int     a, b, c;
 
@@ -293,10 +294,10 @@ int main(int argc, char* argv[]) // program entry point.
             b = edge(P, v1, v2);
             c = edge(P, v2, v0);
             // 근데 이렇게하면 덮어씌우게 됨. -> 일단 이걸 여기서 처음 
-            
+
             // Winding & test
             bool inside = (W1 > 0) ? (a >= 0 && b >= 0 && c >= 0)
-                                   : (a <= 0 && b <= 0 && c <= 0);
+                : (a <= 0 && b <= 0 && c <= 0);
 
             if (!inside)
                 continue;
@@ -304,16 +305,19 @@ int main(int argc, char* argv[]) // program entry point.
             P.zValue = z;
 
             ZBuffer[y * WIDTH + x] = { P.zValue };
-            
+
             // 일단 저장 ㄱㄱ.
-            
+
 
             l0 = b * invW1;
             l1 = c * invW1;
             l2 = a * invW1;
             // each constant represents C_v0, C_v1, C_v2
+            R = (uint8_t)(l0 * 0 +   l1 * 0 +   l2 * 255);
+            G = (uint8_t)(l0 * 0 +   l1 * 255 + l2 * 0  );
+            B = (uint8_t)(l0 * 255 + l1 * 0 +   l2 * 255);
+            framebuffer[y * WIDTH + x] = { R, G, B, 255 };
 
-            
         }
     }
 
@@ -344,7 +348,7 @@ int main(int argc, char* argv[]) // program entry point.
                 continue;
 
             P.zValue = z;
-            
+
 
             l3 = e * invW2;
             l4 = f * invW2;
@@ -360,7 +364,7 @@ int main(int argc, char* argv[]) // program entry point.
                 framebuffer[y * WIDTH + x] = { R, G, B, 255 };
             }
             // there is no same value. 
-            /*else 
+            /*else
             {
                 R = (uint8_t)(l0 * 120 + l1 * 30 + l2 * 180);
                 G = (uint8_t)(l0 * 210 + l1 * 68 + l2 * 90);
@@ -371,26 +375,26 @@ int main(int argc, char* argv[]) // program entry point.
             // 바꾼 다음 z버퍼에 있는 값을 토대로 test한 후 그 이후가 되서야 그린다?
             // 일단 한 번 그린 다음에, 덮어씌운다?
             // each constant represents C_v0, C_v1, C_v2
-         
-          
-            
+
+
+
         }
     }
 
-  
 
-   /* bool inside = (a <= 0 && b <= 0 && c <= 0);
-    if (inside)
-        SDL_Log("inside");
 
-    SDL_Log("l0 + l1 + l1 = %.1f", (l0 + l1 + l2));*/
+    /* bool inside = (a <= 0 && b <= 0 && c <= 0);
+     if (inside)
+         SDL_Log("inside");
 
-    // now what?
-    // 
+     SDL_Log("l0 + l1 + l1 = %.1f", (l0 + l1 + l2));*/
 
-    /*a = edge(P2, v0, v1);
-    b = edge(P2, v1, v2);
-    c = edge(P2, v2, v0);*/
+     // now what?
+     // 
+
+     /*a = edge(P2, v0, v1);
+     b = edge(P2, v1, v2);
+     c = edge(P2, v2, v0);*/
 
     if (!SDL_Init(SDL_INIT_VIDEO))
     {
@@ -411,8 +415,8 @@ int main(int argc, char* argv[]) // program entry point.
 
     SDL_Texture* texture = SDL_CreateTexture(
         renderer,
-        SDL_PIXELFORMAT_RGBA8888,       
-        SDL_TEXTUREACCESS_STREAMING,     
+        SDL_PIXELFORMAT_RGBA8888,
+        SDL_TEXTUREACCESS_STREAMING,
         WIDTH, HEIGHT
     );
 
@@ -425,7 +429,7 @@ int main(int argc, char* argv[]) // program entry point.
     }
 
     bool running = true;
-    SDL_Event event; 
+    SDL_Event event;
 
     float mx, my;
     int ww, wh;
@@ -440,9 +444,9 @@ int main(int argc, char* argv[]) // program entry point.
 
         int fx = (int)(mx * WIDTH / ww);
         int fy = (int)(my * HEIGHT / wh);
-        
 
-        
+
+
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_EVENT_QUIT)
@@ -456,13 +460,13 @@ int main(int argc, char* argv[]) // program entry point.
             //    // if this is maximized, we need to resize the window to the user's resolution.
             //}
         }
-        
+
         SDL_UpdateTexture(texture, nullptr, framebuffer.data(), WIDTH * sizeof(Entry));
 
         SDL_RenderTexture(renderer, texture, nullptr, nullptr);
-        
-        SDL_RenderPresent(renderer); 
-        SDL_RenderClear(renderer); 
+
+        SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
     }
 
     SDL_DestroyTexture(texture);
@@ -473,3 +477,4 @@ int main(int argc, char* argv[]) // program entry point.
 
     return 0;
 }
+
