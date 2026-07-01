@@ -332,6 +332,8 @@ int main(int argc, char* argv[]) // program entry point.
     {
         for (int x = xmin2; x <= xmax2; x++)
         {
+            // another test
+
             float   z = 0.2f;
             Vec3    P = { x, y };
             uint8_t R, G, B;
